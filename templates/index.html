@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batik Outline + G-code Generator</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f4f4f4;
+        color: #222;
+    }
+    .container {
+        max-width: 1220px;
+        margin: 28px auto;
+        background: white;
+        border-radius: 14px;
+        padding: 24px;
+        box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+    h1 { margin-top: 0; }
+    .layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 22px;
+    }
+    .canvas-wrap {
+        border: 2px solid #222;
+        background: white;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+    canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+        touch-action: none;
+        cursor: crosshair;
+        background: white;
+    }
+    .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+        align-items: center;
+    }
+    button, .button {
+        border: none;
+        padding: 10px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #222;
+        color: white;
+        font-size: 14px;
+    }
+    button.secondary, .button.secondary { background: #666; }
+    button.active { outline: 3px solid #bbb; }
+    .panel {
+        background: #fafafa;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 16px;
+    }
+    input[type="file"], input[type="number"] {
+        width: 100%;
+        margin: 5px 0 10px;
+    }
+    input[type="number"] {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+    input[type="range"] { width: 180px; }
+    .generate {
+        width: 100%;
+        font-size: 17px;
+        padding: 14px;
+        margin-top: 10px;
+    }
+    .error {
+        background: #ffe8e8;
+        border: 1px solid #e3a4a4;
+        color: #8c1717;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+    .warning {
+        background: #fff8df;
+        border: 1px solid #e3cf7a;
+        padding: 11px;
+        border-radius: 8px;
+        margin-top: 12px;
+        font-size: 13px;
+    }
+    .results {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-top: 28px;
+    }
+    .result-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 12px;
+    }
+    .result-card img {
+        display: block;
+        width: 100%;
+        background: white;
+        border: 1px solid #ddd;
+    }
+    .download {
+        display: inline-block;
+        text-decoration: none;
+        margin-top: 10px;
+    }
+    .small {
+        color: #666;
+        font-size: 13px;
+        line-height: 1.45;
+    }
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 10px;
+    }
+    #loading {
+        display: none;
+        margin-top: 10px;
+        font-weight: bold;
+    }
+    @media (max-width: 850px) {
+        .layout, .results { grid-template-columns: 1fr; }
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Batik Wax Outline + G-code Generator</h1>
+    <p>Draw in the browser or upload a sketch. The app simplifies it into a batik outline and automatically creates downloadable G-code.</p>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" id="generateForm">
+        <div class="layout">
+            <div>
+                <div class="canvas-wrap">
+                    <canvas id="drawingCanvas" width="900" height="650"></canvas>
+                </div>
+
+                <div class="toolbar">
+                    <button type="button" id="penBtn" class="active">Pen</button>
+                    <button type="button" id="eraserBtn" class="secondary">Eraser</button>
+                    <button type="button" id="undoBtn" class="secondary">Undo</button>
+                    <button type="button" id="clearBtn" class="secondary">Clear</button>
+
+                    <label>
+                        Brush:
+                        <input type="range" id="brushSize" min="2" max="40" value="8">
+                        <span id="brushValue">8</span> px
+                    </label>
+                </div>
+
+                <p class="small">
+                    Use large, simple shapes. Mouse, stylus and touchscreen drawing are supported.
+                </p>
+            </div>
+
+            <div class="panel">
+                <h3>Optional image upload</h3>
+                <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp">
+                <button type="button" class="secondary" id="loadToCanvasBtn">Load onto canvas</button>
+
+                <hr>
+
+                <h3>G-code settings</h3>
+                <div class="settings-grid">
+                    <div>
+                        <label>Width (mm)</label>
+                        <input type="number" name="drawing_width" value="150" min="10" max="1000" step="1">
+                    </div>
+                    <div>
+                        <label>Height (mm)</label>
+                        <input type="number" name="drawing_height" value="150" min="10" max="1000" step="1">
+                    </div>
+                    <div>
+                        <label>Drawing Z (mm)</label>
+                        <input type="number" name="z_draw" value="0.2" step="0.1">
+                    </div>
+                    <div>
+                        <label>Travel Z (mm)</label>
+                        <input type="number" name="z_travel" value="2.0" step="0.1">
+                    </div>
+                    <div>
+                        <label>Draw feed (mm/min)</label>
+                        <input type="number" name="feed_draw" value="1200" min="10" step="10">
+                    </div>
+                    <div>
+                        <label>Travel feed (mm/min)</label>
+                        <input type="number" name="feed_travel" value="3000" min="10" step="10">
+                    </div>
+                </div>
+
+                <label>Contour simplification</label>
+                <input type="number" name="simplify" value="1.5" min="0.1" max="20" step="0.1">
+
+                <input type="hidden" name="canvas_data" id="canvasData">
+
+                <button type="submit" class="generate">Generate Outline + G-code</button>
+                <div id="loading">Generating outline and G-code…</div>
+
+                <div class="warning">
+                    Test generated G-code with the wax tool removed or safely raised first.
+                    Verify machine limits, Z direction, origin and feed rates before running.
+                </div>
+            </div>
+        </div>
+    </form>
+
+    {% if input_image and output_image %}
+    <div class="results">
+        <div class="result-card">
+            <h3>Input</h3>
+            <img src="{{ input_image }}" alt="Input drawing">
+        </div>
+
+        {% if raw_output_image %}
+        <div class="result-card">
+            <h3>AI outline</h3>
+            <img src="{{ raw_output_image }}" alt="AI generated batik outline">
+            <a class="button secondary download" href="{{ raw_output_image }}" download>Download AI PNG</a>
+        </div>
+        {% endif %}
+
+        <div class="result-card">
+            <h3>Machine-ready B&W</h3>
+            <img src="{{ output_image }}" alt="Clean black and white outline">
+            <a class="button secondary download" href="{{ output_image }}" download>Download B&W PNG</a>
+
+            {% if gcode_file %}
+            <br>
+            <a class="button download" href="{{ gcode_file }}" download>Download G-code</a>
+            {% endif %}
+
+            {% if gcode_stats %}
+            <p class="small">
+                {{ gcode_stats.paths }} contour paths,
+                {{ gcode_stats.points }} G-code points,
+                approx. {{ "%.1f"|format(gcode_stats.width_mm) }} ×
+                {{ "%.1f"|format(gcode_stats.height_mm) }} mm.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+const canvas = document.getElementById("drawingCanvas");
+const ctx = canvas.getContext("2d");
+
+ctx.fillStyle = "white";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+
+let drawing = false;
+let erasing = false;
+let brushSize = 8;
+let history = [];
+let canvasChanged = false;
+
+function saveState() {
+    history.push(canvas.toDataURL("image/png"));
+    if (history.length > 30) history.shift();
+}
+saveState();
+
+function getPoint(e) {
+    const rect = canvas.getBoundingClientRect();
+    return {
+        x: (e.clientX - rect.left) * (canvas.width / rect.width),
+        y: (e.clientY - rect.top) * (canvas.height / rect.height)
+    };
+}
+
+function startDrawing(e) {
+    e.preventDefault();
+    drawing = true;
+    saveState();
+    const p = getPoint(e);
+    ctx.beginPath();
+    ctx.moveTo(p.x, p.y);
+}
+
+function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = getPoint(e);
+    ctx.strokeStyle = erasing ? "white" : "black";
+    ctx.lineWidth = brushSize;
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    canvasChanged = true;
+}
+
+function stopDrawing() {
+    if (!drawing) return;
+    drawing = false;
+    ctx.closePath();
+}
+
+canvas.addEventListener("pointerdown", startDrawing);
+canvas.addEventListener("pointermove", draw);
+canvas.addEventListener("pointerup", stopDrawing);
+canvas.addEventListener("pointerleave", stopDrawing);
+
+document.getElementById("penBtn").onclick = () => {
+    erasing = false;
+    penBtn.classList.add("active");
+    eraserBtn.classList.remove("active");
+};
+
+document.getElementById("eraserBtn").onclick = () => {
+    erasing = true;
+    eraserBtn.classList.add("active");
+    penBtn.classList.remove("active");
+};
+
+document.getElementById("brushSize").oninput = (e) => {
+    brushSize = Number(e.target.value);
+    document.getElementById("brushValue").textContent = brushSize;
+};
+
+document.getElementById("clearBtn").onclick = () => {
+    saveState();
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    canvasChanged = false;
+};
+
+document.getElementById("undoBtn").onclick = () => {
+    if (!history.length) return;
+    const state = history.pop();
+    const img = new Image();
+    img.onload = () => {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        canvasChanged = true;
+    };
+    img.src = state;
+};
+
+document.getElementById("loadToCanvasBtn").onclick = () => {
+    const file = document.getElementById("imageInput").files[0];
+    if (!file) {
+        alert("Choose an image first.");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            saveState();
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const scale = Math.min(
+                canvas.width / img.width,
+                canvas.height / img.height
+            );
+
+            const w = img.width * scale;
+            const h = img.height * scale;
+
+            ctx.drawImage(
+                img,
+                (canvas.width - w) / 2,
+                (canvas.height - h) / 2,
+                w,
+                h
+            );
+
+            canvasChanged = true;
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+};
+
+document.getElementById("generateForm").addEventListener("submit", () => {
+    document.getElementById("canvasData").value =
+        canvasChanged ? canvas.toDataURL("image/png") : "";
+    document.getElementById("loading").style.display = "block";
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+Flask
+openai
+python-dotenv
+Pillow
+opencv-python
+numpy
+gunicorn
