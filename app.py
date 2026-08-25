@@ -364,7 +364,7 @@ def image_to_gcode(
     actual_h = h * scale
 
     # Center the artwork on the physical build plate.
-    offset_x = (cfg["machine_width"] - actual_w) / 2.0
+    offset_x = (cfg["machine_width"] - actual_w) / 2.0+56
     offset_y = (cfg["machine_depth"] - actual_h) / 2.0
 
     usable = []
