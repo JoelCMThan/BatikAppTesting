@@ -35,7 +35,7 @@ Preserve the main subject, recognizable shape, pose, proportions, and important
 features, but simplify the drawing substantially.
 
 STYLE:
-- Add stars
+- A coloring book page of minimalist Malaysian floral motifs, clean black outlines on a solid white background, simple line art, batik style structure 
 - clean black outlines on a pure white background
 - thick, smooth, consistent lines
 - simple coloring-book / batik tracing template
