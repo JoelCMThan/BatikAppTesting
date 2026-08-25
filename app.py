@@ -35,6 +35,7 @@ Preserve the main subject, recognizable shape, pose, proportions, and important
 features, but simplify the drawing substantially.
 
 STYLE:
+- Add stars
 - clean black outlines on a pure white background
 - thick, smooth, consistent lines
 - simple coloring-book / batik tracing template
