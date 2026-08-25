@@ -263,7 +263,7 @@ def index():
 
             with open(source_path, "rb") as image_file:
                 result = client.images.edit(
-                    model="gpt-image-1",
+                    model="gpt-image-2",
                     image=image_file,
                     prompt=BATIK_PROMPT,
                     size="1024x1024"
