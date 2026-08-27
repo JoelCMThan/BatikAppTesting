@@ -204,7 +204,7 @@ CURA_PROFILE = {
     "retract_before_outer_wall": True,
     "z_hop_when_retracted": True,
     "z_hop_only_over_printed_parts": False,
-    "z_hop_height": 2.2,
+    "z_hop_height": 2,
     "z_hop_speed": 5.0,
 
     # Cooling
@@ -261,13 +261,13 @@ M109 S{hotend_temp:.0f}
 G92 E0 ; Reset Extruder
 G28 ; Home all axes
 M302 S0 ; Allow cold extrusion
-G1 Z2.0 F3000
+G1 Z2.2 F3000
 G1 X0.1 Y20 Z0.3 F5000.0 ; Move to start position
 G1 X0.1 Y200.0 Z0.3 F1500.0 E15 ; Draw the first line
 G1 X0.4 Y200.0 Z0.3 F5000.0 ; Move to side a little
 G1 X0.4 Y20 Z0.3 F1500.0 E30 ; Draw the second line
 G92 E0 ; Reset Extruder
-G1 Z2.0 F3000
+G1 Z2.2 F3000
 G1 X5 Y20 Z0.3 F5000.0 ; Move over to prevent blob
 G92 E0
 """.strip()
@@ -315,7 +315,7 @@ def image_to_gcode(
     drawing_width_mm: float = 150.0,
     drawing_height_mm: float = 150.0,
     z_draw: float | None = None,
-    z_travel: float = 2.0,
+    z_travel: float = 2.2,
     feed_draw: float | None = None,
     feed_travel: float | None = None,
     min_contour_area: float = 20.0,
