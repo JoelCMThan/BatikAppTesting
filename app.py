@@ -204,7 +204,7 @@ CURA_PROFILE = {
     "retract_before_outer_wall": True,
     "z_hop_when_retracted": True,
     "z_hop_only_over_printed_parts": False,
-    "z_hop_height": 2.0,
+    "z_hop_height": 2.2,
     "z_hop_speed": 5.0,
 
     # Cooling
@@ -433,9 +433,6 @@ def image_to_gcode(
         f"; E/mm: {e_per_mm:.6f}",
         "; Top/Bottom: 0 layers, Infill: 0%, Walls: 1",
         "; ------------------------------------------------------------",
-        "G21 ; units in millimeters",
-        "G90 ; absolute XYZ positioning",
-        "M82 ; absolute extrusion",
         START_GCODE.format(hotend_temp=cfg["printing_temperature"]),
         f"G92 E0",
         fan_cmd,
