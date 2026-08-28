@@ -315,7 +315,7 @@ def image_to_gcode(
     drawing_width_mm: float = 150.0,
     drawing_height_mm: float = 150.0,
     z_draw: float | None = None,
-    z_travel: float = 2.2,
+    z_travel: float = 5,
     feed_draw: float | None = None,
     feed_travel: float | None = None,
     min_contour_area: float = 20.0,
