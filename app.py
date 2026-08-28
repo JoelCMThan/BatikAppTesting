@@ -169,10 +169,10 @@ CURA_PROFILE = {
     "gradual_flow_enabled": False,
 
     # Temperature (exactly as shown in the supplied Cura screenshots)
-    "printing_temperature": 67.0,
-    "printing_temperature_initial_layer": 67.0,
-    "initial_printing_temperature": 67.0,
-    "final_printing_temperature": 67.0,
+    "printing_temperature": 80.0,
+    "printing_temperature_initial_layer": 80.0,
+    "initial_printing_temperature": 80.0,
+    "final_printing_temperature": 80.0,
     "build_plate_temperature": 0.0,
     "build_plate_temperature_initial_layer": 0.0,
 
@@ -204,8 +204,8 @@ CURA_PROFILE = {
     "retract_before_outer_wall": True,
     "z_hop_when_retracted": True,
     "z_hop_only_over_printed_parts": False,
-    "z_hop_height": 2,
-    "z_hop_speed": 5.0,
+    "z_hop_height": 8,
+    "z_hop_speed": 3.5,
 
     # Cooling
     "enable_print_cooling": True,
@@ -255,9 +255,9 @@ CURA_PROFILE = {
 # These are intentionally kept verbatim where legible.
 START_GCODE = r"""; Ender 3 Custom Start G-code
 M105
-M104 S{hotend_temp:.0f}
+M104 S80
 M105
-M109 S{hotend_temp:.0f}
+M109 S80
 G92 E0 ; Reset Extruder
 G28 ; Home all axes
 M302 S0 ; Allow cold extrusion
@@ -274,7 +274,8 @@ G91 ; Relative positioning
 G1 E-2 F2700 ; Retract a bit
 G1 E-2 Z0.240 F2400 ; Retract and raise Z
 G1 X5 Y5 F3000 ; Wipe out
-G1 Z60 ; Raise Z more
+G28 Y0 Z0; Reset Y and Z axis
+G1 Z48 ; Raise Z more
 G90 ; Absolute positioning
 M106 S0 ; Turn-off fan
 M104 S0 ; Turn-off hotend
@@ -312,7 +313,7 @@ def image_to_gcode(
     drawing_width_mm: float = 150.0,
     drawing_height_mm: float = 150.0,
     z_draw: float | None = None,
-    z_travel: float = 5,
+    z_travel: float = 8,
     feed_draw: float | None = None,
     feed_travel: float | None = None,
     min_contour_area: float = 20.0,
