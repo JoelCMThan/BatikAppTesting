@@ -204,7 +204,7 @@ CURA_PROFILE = {
     "retract_before_outer_wall": True,
     "z_hop_when_retracted": True,
     "z_hop_only_over_printed_parts": False,
-    "z_hop_height": 8,
+    "z_hop_height": 2,
     "z_hop_speed": 3.5,
 
     # Cooling
@@ -313,7 +313,7 @@ def image_to_gcode(
     drawing_width_mm: float = 150.0,
     drawing_height_mm: float = 150.0,
     z_draw: float | None = None,
-    z_travel: float = 8,
+    z_travel: float = 2,
     feed_draw: float | None = None,
     feed_travel: float | None = None,
     min_contour_area: float = 20.0,
