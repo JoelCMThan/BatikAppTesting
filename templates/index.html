@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batik Outline + G-code Generator</title>
+<title>Batik Outline + Machine Language Generator</title>
 <style>
     * { box-sizing: border-box; }
     body {
@@ -140,7 +140,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>Batik Wax Outline + G-code Generator</h1>
+    <h1>Batik Wax Outline + Machine Language Generator</h1>
     <p>Draw in the browser or upload a sketch. The app simplifies it into a batik outline and automatically creates downloadable G-code.</p>
 
     {% if error %}
@@ -179,7 +179,7 @@
 
                 <hr>
 
-                <h3>G-code settings</h3>
+                <h3>Machine language settings</h3>
                 <div class="settings-grid">
                     <div>
                         <label>Width (mm)</label>
@@ -212,11 +212,11 @@
 
                 <input type="hidden" name="canvas_data" id="canvasData">
 
-                <button type="submit" class="generate">Generate Image + G-code</button>
-                <div id="loading">Generating Image and G-code…</div>
+                <button type="submit" class="generate">Generate Image + Machine Language</button>
+                <div id="loading">Generating Image and Machine Language…</div>
 
                 <div class="warning">
-                    Test generated G-code with the wax tool removed or safely raised first.
+                    Test generated Machine Language with the wax tool removed or safely raised first.
                     Verify machine limits, Z direction, origin and feed rates before running.
                 </div>
             </div>
@@ -245,13 +245,13 @@
 
             {% if gcode_file %}
             <br>
-            <a class="button download" href="{{ gcode_file }}" download>Download G-code</a>
+            <a class="button download" href="{{ gcode_file }}" download>Download Machine Language</a>
             {% endif %}
 
             {% if gcode_stats %}
             <p class="small">
                 {{ gcode_stats.paths }} contour paths,
-                {{ gcode_stats.points }} G-code points,
+                {{ gcode_stats.points }} Machine Language points,
                 approx. {{ "%.1f"|format(gcode_stats.width_mm) }} ×
                 {{ "%.1f"|format(gcode_stats.height_mm) }} mm.
             </p>
