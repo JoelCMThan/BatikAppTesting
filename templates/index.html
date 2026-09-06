@@ -4,34 +4,131 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Batik Outline + Machine Language Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-    * { box-sizing: border-box; }
+    :root {
+        --batik-indigo: #1a2744;
+        --batik-gold: #c9a227;
+        --batik-gold-light: #e8d48b;
+        --batik-terracotta: #b85c38;
+        --batik-teal: #2a6f6f;
+        --batik-cream: #f8f1e3;
+        --batik-deep: #0f172a;
+        --paper: #fffdf8;
+        --shadow: 0 12px 40px rgba(26, 39, 68, 0.18);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #f4f4f4;
+        font-family: 'Inter', system-ui, sans-serif;
+        background: 
+            radial-gradient(ellipse at 20% 0%, rgba(201, 162, 39, 0.12) 0%, transparent 50%),
+            radial-gradient(ellipse at 80% 100%, rgba(42, 111, 111, 0.15) 0%, transparent 50%),
+            linear-gradient(160deg, #1a2744 0%, #0f172a 45%, #1a2a3a 100%);
         color: #222;
+        min-height: 100vh;
+        padding: 28px 16px 60px;
     }
+
     .container {
-        max-width: 1220px;
-        margin: 28px auto;
-        background: white;
-        border-radius: 14px;
-        padding: 24px;
-        box-shadow: 0 8px 24px rgba(0,0,0,.08);
+        max-width: 1280px;
+        margin: 0 auto;
+        background: var(--paper);
+        border-radius: 24px;
+        padding: 32px 36px 40px;
+        box-shadow: var(--shadow), 0 0 0 1px rgba(201, 162, 39, 0.25);
+        position: relative;
+        overflow: hidden;
     }
-    h1 { margin-top: 0; }
+
+    /* Decorative batik-inspired corner accents */
+    .container::before,
+    .container::after {
+        content: "";
+        position: absolute;
+        width: 120px;
+        height: 120px;
+        opacity: 0.07;
+        background: radial-gradient(circle, var(--batik-gold) 2px, transparent 2px);
+        background-size: 14px 14px;
+        pointer-events: none;
+    }
+    .container::before { top: -20px; left: -20px; transform: rotate(15deg); }
+    .container::after { bottom: -30px; right: -20px; transform: rotate(-25deg); }
+
+    header {
+        text-align: center;
+        margin-bottom: 28px;
+        position: relative;
+    }
+
+    header h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        font-weight: 700;
+        color: var(--batik-indigo);
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+    }
+
+    header h1 span {
+        color: var(--batik-gold);
+    }
+
+    header p {
+        color: #5c5a52;
+        font-size: 1.05rem;
+        max-width: 620px;
+        margin: 0 auto;
+        line-height: 1.5;
+    }
+
+    .batik-divider {
+        width: 180px;
+        height: 4px;
+        margin: 18px auto 0;
+        background: linear-gradient(90deg, transparent, var(--batik-gold), var(--batik-terracotta), var(--batik-gold), transparent);
+        border-radius: 4px;
+    }
+
     .layout {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) 360px;
-        gap: 22px;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 28px;
+        margin-top: 28px;
     }
+
+    /* Canvas area */
+    .canvas-section {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
     .canvas-wrap {
-        border: 2px solid #222;
+        border: 3px solid var(--batik-indigo);
         background: white;
+        border-radius: 16px;
         overflow: hidden;
-        border-radius: 10px;
+        box-shadow: 
+            0 0 0 6px var(--batik-cream),
+            0 8px 24px rgba(26, 39, 68, 0.12);
+        position: relative;
     }
+
+    .canvas-wrap::after {
+        content: "BATIK CANVAS";
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        color: rgba(26, 39, 68, 0.25);
+        font-weight: 600;
+        pointer-events: none;
+    }
+
     canvas {
         display: block;
         width: 100%;
@@ -40,108 +137,316 @@
         cursor: crosshair;
         background: white;
     }
+
     .toolbar {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin: 12px 0;
+        gap: 10px;
         align-items: center;
+        background: linear-gradient(135deg, #f7f0e4, #f0e6d4);
+        padding: 12px 16px;
+        border-radius: 14px;
+        border: 1px solid rgba(201, 162, 39, 0.35);
     }
+
     button, .button {
         border: none;
-        padding: 10px 14px;
-        border-radius: 8px;
-        cursor: pointer;
-        background: #222;
-        color: white;
-        font-size: 14px;
-    }
-    button.secondary, .button.secondary { background: #666; }
-    button.active { outline: 3px solid #bbb; }
-    .panel {
-        background: #fafafa;
-        border: 1px solid #ddd;
+        padding: 10px 16px;
         border-radius: 10px;
-        padding: 16px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
     }
-    input[type="file"], input[type="number"] {
-        width: 100%;
-        margin: 5px 0 10px;
+
+    button:not(.secondary):not(.generate) {
+        background: var(--batik-indigo);
+        color: white;
     }
+
+    button:not(.secondary):not(.generate):hover {
+        background: #243356;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 39, 68, 0.3);
+    }
+
+    button.secondary, .button.secondary {
+        background: #e8e0d0;
+        color: var(--batik-indigo);
+    }
+
+    button.secondary:hover {
+        background: #ddd4c0;
+        transform: translateY(-1px);
+    }
+
+    button.active {
+        background: var(--batik-gold) !important;
+        color: var(--batik-deep) !important;
+        box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.4);
+    }
+
+    .brush-control {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+        font-size: 13px;
+        color: #5c5a52;
+        font-weight: 500;
+    }
+
+    input[type="range"] {
+        width: 110px;
+        accent-color: var(--batik-gold);
+    }
+
+    .hint {
+        font-size: 13px;
+        color: #7a776c;
+        line-height: 1.45;
+        padding-left: 4px;
+    }
+
+    /* Side panel */
+    .panel {
+        background: linear-gradient(165deg, #fdf8f0 0%, #f5ede0 100%);
+        border: 1px solid rgba(201, 162, 39, 0.4);
+        border-radius: 18px;
+        padding: 22px;
+        box-shadow: 0 8px 24px rgba(26, 39, 68, 0.08);
+        height: fit-content;
+    }
+
+    .panel h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.15rem;
+        color: var(--batik-indigo);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .panel h3::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background: var(--batik-gold);
+        border-radius: 50%;
+    }
+
+    .panel hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.5), transparent);
+        margin: 20px 0;
+    }
+
+    label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: #4a483f;
+        margin-bottom: 4px;
+    }
+
+    input[type="file"],
     input[type="number"] {
-        padding: 8px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
+        width: 100%;
+        margin-bottom: 12px;
+        padding: 10px 12px;
+        border: 1.5px solid #d9cfc0;
+        border-radius: 10px;
+        background: white;
+        font-size: 14px;
+        transition: border-color 0.2s;
     }
-    input[type="range"] { width: 180px; }
+
+    input[type="number"]:focus,
+    input[type="file"]:focus {
+        outline: none;
+        border-color: var(--batik-gold);
+        box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.2);
+    }
+
+    .settings-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0 12px;
+    }
+
     .generate {
         width: 100%;
-        font-size: 17px;
-        padding: 14px;
-        margin-top: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        padding: 15px;
+        margin-top: 8px;
+        background: linear-gradient(135deg, var(--batik-gold) 0%, #b8921f 100%);
+        color: var(--batik-deep);
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(201, 162, 39, 0.35);
+        letter-spacing: 0.3px;
     }
-    .error {
-        background: #ffe8e8;
-        border: 1px solid #e3a4a4;
-        color: #8c1717;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 16px;
+
+    .generate:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 28px rgba(201, 162, 39, 0.45);
+        background: linear-gradient(135deg, #d4ae30 0%, var(--batik-gold) 100%);
     }
+
+    #loading {
+        display: none;
+        margin-top: 14px;
+        text-align: center;
+        font-weight: 600;
+        color: var(--batik-indigo);
+        font-size: 14px;
+    }
+
+    #loading::after {
+        content: "";
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        margin-left: 8px;
+        border: 2.5px solid var(--batik-gold);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: middle;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
     .warning {
-        background: #fff8df;
-        border: 1px solid #e3cf7a;
-        padding: 11px;
-        border-radius: 8px;
-        margin-top: 12px;
-        font-size: 13px;
+        background: linear-gradient(135deg, #fff8e8, #fff3d4);
+        border: 1px solid #e8d48b;
+        padding: 12px 14px;
+        border-radius: 12px;
+        margin-top: 16px;
+        font-size: 12.5px;
+        color: #6b5a2a;
+        line-height: 1.5;
     }
+
+    .error {
+        background: #fff0f0;
+        border: 1px solid #e8a0a0;
+        color: #8c1717;
+        padding: 14px 16px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    /* Results */
     .results {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
-        margin-top: 28px;
+        gap: 22px;
+        margin-top: 40px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(201, 162, 39, 0.3);
     }
+
     .result-card {
-        border: 1px solid #ddd;
-        border-radius: 10px;
-        padding: 12px;
+        background: white;
+        border: 1px solid #e8dfd0;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 6px 20px rgba(26, 39, 68, 0.06);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
+
+    .result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 14px 32px rgba(26, 39, 68, 0.12);
+    }
+
+    .result-card h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.1rem;
+        color: var(--batik-indigo);
+        margin-bottom: 12px;
+    }
+
     .result-card img {
         display: block;
         width: 100%;
         background: white;
-        border: 1px solid #ddd;
+        border: 1px solid #e5dcd0;
+        border-radius: 10px;
     }
+
     .download {
         display: inline-block;
         text-decoration: none;
-        margin-top: 10px;
-    }
-    .small {
-        color: #666;
+        margin-top: 12px;
+        padding: 9px 14px;
         font-size: 13px;
-        line-height: 1.45;
     }
-    .settings-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0 10px;
-    }
-    #loading {
-        display: none;
+
+    .small {
+        color: #6b675c;
+        font-size: 13px;
+        line-height: 1.5;
         margin-top: 10px;
-        font-weight: bold;
     }
-    @media (max-width: 850px) {
-        .layout, .results { grid-template-columns: 1fr; }
+
+    /* Launch button */
+    .launch-wrap {
+        text-align: center;
+        margin-top: 36px;
+    }
+
+    .launch-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--batik-teal), #1e5555);
+        color: white;
+        padding: 14px 28px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 15px;
+        text-decoration: none;
+        box-shadow: 0 8px 24px rgba(42, 111, 111, 0.35);
+        transition: all 0.25s ease;
+    }
+
+    .launch-btn:hover {
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 12px 30px rgba(42, 111, 111, 0.45);
+    }
+
+    @media (max-width: 900px) {
+        .layout, .results {
+            grid-template-columns: 1fr;
+        }
+        .container {
+            padding: 24px 18px 32px;
+        }
+        .brush-control {
+            margin-left: 0;
+            width: 100%;
+        }
     }
 </style>
 </head>
 <body>
 <div class="container">
-    <h1>Batik Wax Outline + Machine Language Generator</h1>
-    <p>Draw in the browser or upload a sketch. The app simplifies it into a batik outline and automatically creates downloadable Machine Language.</p>
+    <header>
+        <h1>Batik Wax Outline <span>+</span> Machine Language</h1>
+        <p>Draw or upload a sketch. Transform it into a refined batik outline and generate ready-to-run machine language for your wax tool.</p>
+        <div class="batik-divider"></div>
+    </header>
 
     {% if error %}
     <div class="error">{{ error }}</div>
@@ -149,37 +454,37 @@
 
     <form method="POST" enctype="multipart/form-data" id="generateForm">
         <div class="layout">
-            <div>
+            <div class="canvas-section">
                 <div class="canvas-wrap">
                     <canvas id="drawingCanvas" width="900" height="650"></canvas>
                 </div>
 
                 <div class="toolbar">
-                    <button type="button" id="penBtn" class="active">Pen</button>
-                    <button type="button" id="eraserBtn" class="secondary">Eraser</button>
-                    <button type="button" id="undoBtn" class="secondary">Undo</button>
-                    <button type="button" id="clearBtn" class="secondary">Clear</button>
+                    <button type="button" id="penBtn" class="active">✏️ Pen</button>
+                    <button type="button" id="eraserBtn" class="secondary">🧹 Eraser</button>
+                    <button type="button" id="undoBtn" class="secondary">↩ Undo</button>
+                    <button type="button" id="clearBtn" class="secondary">🗑 Clear</button>
 
-                    <label>
-                        Brush:
+                    <div class="brush-control">
+                        Brush
                         <input type="range" id="brushSize" min="2" max="40" value="8">
                         <span id="brushValue">8</span> px
-                    </label>
+                    </div>
                 </div>
 
-                <p class="small">
-                    Use large, simple shapes. Mouse, stylus and touchscreen drawing are supported.
+                <p class="hint">
+                    Tip: Use bold, simple shapes. Mouse, stylus and touch are fully supported.
                 </p>
             </div>
 
             <div class="panel">
-                <h3>Optional image upload</h3>
+                <h3>Optional Image Upload</h3>
                 <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp">
-                <button type="button" class="secondary" id="loadToCanvasBtn">Load onto canvas</button>
+                <button type="button" class="secondary" id="loadToCanvasBtn" style="width:100%;">Load onto Canvas</button>
 
                 <hr>
 
-                <h3>Machine language settings</h3>
+                <h3>Machine Language Settings</h3>
                 <div class="settings-grid">
                     <div>
                         <label>Width (mm)</label>
@@ -213,10 +518,11 @@
                 <input type="hidden" name="canvas_data" id="canvasData">
 
                 <button type="submit" class="generate">Generate Image + Machine Language</button>
+
                 <div id="loading">Generating Image and Machine Language…</div>
 
                 <div class="warning">
-                    Test generated Machine Language with the wax tool removed or safely raised first.
+                    Always test generated Machine Language with the wax tool removed or safely raised first.
                     Verify machine limits, Z direction, origin and feed rates before running.
                 </div>
             </div>
@@ -232,26 +538,24 @@
 
         {% if raw_output_image %}
         <div class="result-card">
-            <h3>AI outline</h3>
+            <h3>AI Batik Outline</h3>
             <img src="{{ raw_output_image }}" alt="AI generated batik outline">
             <a class="button secondary download" href="{{ raw_output_image }}" download>Download AI PNG</a>
         </div>
         {% endif %}
 
         <div class="result-card">
-            <h3>Machine-ready B&W</h3>
+            <h3>Machine-ready B&amp;W</h3>
             <img src="{{ output_image }}" alt="Clean black and white outline">
-            <a class="button secondary download" href="{{ output_image }}" download>Download B&W PNG</a>
-
+            <a class="button secondary download" href="{{ output_image }}" download>Download B&amp;W PNG</a>
             {% if gcode_file %}
             <br>
-            <a class="button download" href="{{ gcode_file }}" download>Download Machine Language</a>
+            <a class="button download" href="{{ gcode_file }}" download style="background:var(--batik-indigo);color:white;">Download Machine Language</a>
             {% endif %}
-
             {% if gcode_stats %}
             <p class="small">
-                {{ gcode_stats.paths }} contour paths,
-                {{ gcode_stats.points }} Machine Language points,
+                {{ gcode_stats.paths }} contour paths,<br>
+                {{ gcode_stats.points }} Machine Language points,<br>
                 approx. {{ "%.1f"|format(gcode_stats.width_mm) }} ×
                 {{ "%.1f"|format(gcode_stats.height_mm) }} mm.
             </p>
@@ -259,15 +563,17 @@
         </div>
     </div>
     {% endif %}
-   <button>
-         <a href="batiggerappdefnotpronterface://" style="color: white; text-decoration: none;">Launch Software</a>
-   </button>
+
+    <div class="launch-wrap">
+        <a href="batiggerappdefnotpronterface://" class="launch-btn">
+            🚀 Launch Software
+        </a>
+    </div>
 </div>
 
 <script>
 const canvas = document.getElementById("drawingCanvas");
 const ctx = canvas.getContext("2d");
-
 ctx.fillStyle = "white";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.lineCap = "round";
@@ -367,7 +673,6 @@ document.getElementById("loadToCanvasBtn").onclick = () => {
         alert("Choose an image first.");
         return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
         const img = new Image();
@@ -375,15 +680,12 @@ document.getElementById("loadToCanvasBtn").onclick = () => {
             saveState();
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-
             const scale = Math.min(
                 canvas.width / img.width,
                 canvas.height / img.height
             );
-
             const w = img.width * scale;
             const h = img.height * scale;
-
             ctx.drawImage(
                 img,
                 (canvas.width - w) / 2,
@@ -391,7 +693,6 @@ document.getElementById("loadToCanvasBtn").onclick = () => {
                 w,
                 h
             );
-
             canvasChanged = true;
         };
         img.src = event.target.result;
