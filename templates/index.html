@@ -42,7 +42,6 @@
         overflow: hidden;
     }
 
-    /* Decorative batik-inspired corner accents */
     .container::before,
     .container::after {
         content: "";
@@ -59,22 +58,19 @@
 
     header {
         text-align: center;
-        margin-bottom: 28px;
-        position: relative;
+        margin-bottom: 24px;
     }
 
     header h1 {
         font-family: 'Playfair Display', serif;
-        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        font-size: clamp(1.8rem, 4vw, 2.55rem);
         font-weight: 700;
         color: var(--batik-indigo);
         letter-spacing: -0.02em;
         margin-bottom: 8px;
     }
 
-    header h1 span {
-        color: var(--batik-gold);
-    }
+    header h1 span { color: var(--batik-gold); }
 
     header p {
         color: #5c5a52;
@@ -87,33 +83,65 @@
     .batik-divider {
         width: 180px;
         height: 4px;
-        margin: 18px auto 0;
+        margin: 16px auto 0;
         background: linear-gradient(90deg, transparent, var(--batik-gold), var(--batik-terracotta), var(--batik-gold), transparent);
         border-radius: 4px;
     }
 
+    /* ===== TABS ===== */
+    .tabs {
+        display: flex;
+        gap: 6px;
+        margin: 28px 0 24px;
+        background: #f3ebe0;
+        padding: 6px;
+        border-radius: 16px;
+        border: 1px solid rgba(201, 162, 39, 0.35);
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 13px 12px;
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        font-family: 'Inter', sans-serif;
+        font-size: 14.5px;
+        font-weight: 600;
+        color: #5c5a52;
+        cursor: pointer;
+        transition: all 0.22s ease;
+    }
+
+    .tab-btn:hover {
+        background: rgba(201, 162, 39, 0.15);
+        color: var(--batik-indigo);
+    }
+
+    .tab-btn.active {
+        background: linear-gradient(135deg, var(--batik-gold), #b8921f);
+        color: var(--batik-deep);
+        box-shadow: 0 4px 14px rgba(201, 162, 39, 0.35);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ===== CREATE TAB (original) ===== */
     .layout {
         display: grid;
         grid-template-columns: minmax(0, 1fr) 340px;
         gap: 28px;
-        margin-top: 28px;
     }
 
-    /* Canvas area */
-    .canvas-section {
-        display: flex;
-        flex-direction: column;
-        gap: 14px;
-    }
+    .canvas-section { display: flex; flex-direction: column; gap: 14px; }
 
     .canvas-wrap {
         border: 3px solid var(--batik-indigo);
         background: white;
         border-radius: 16px;
         overflow: hidden;
-        box-shadow: 
-            0 0 0 6px var(--batik-cream),
-            0 8px 24px rgba(26, 39, 68, 0.12);
+        box-shadow: 0 0 0 6px var(--batik-cream), 0 8px 24px rgba(26, 39, 68, 0.12);
         position: relative;
     }
 
@@ -163,12 +191,12 @@
         gap: 6px;
     }
 
-    button:not(.secondary):not(.generate) {
+    button:not(.secondary):not(.generate):not(.tab-btn) {
         background: var(--batik-indigo);
         color: white;
     }
 
-    button:not(.secondary):not(.generate):hover {
+    button:not(.secondary):not(.generate):not(.tab-btn):hover {
         background: #243356;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(26, 39, 68, 0.3);
@@ -184,7 +212,7 @@
         transform: translateY(-1px);
     }
 
-    button.active {
+    button.active:not(.tab-btn) {
         background: var(--batik-gold) !important;
         color: var(--batik-deep) !important;
         box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.4);
@@ -200,10 +228,7 @@
         font-weight: 500;
     }
 
-    input[type="range"] {
-        width: 110px;
-        accent-color: var(--batik-gold);
-    }
+    input[type="range"] { width: 110px; accent-color: var(--batik-gold); }
 
     .hint {
         font-size: 13px;
@@ -212,7 +237,6 @@
         padding-left: 4px;
     }
 
-    /* Side panel */
     .panel {
         background: linear-gradient(165deg, #fdf8f0 0%, #f5ede0 100%);
         border: 1px solid rgba(201, 162, 39, 0.4);
@@ -321,9 +345,7 @@
         vertical-align: middle;
     }
 
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .warning {
         background: linear-gradient(135deg, #fff8e8, #fff3d4);
@@ -400,10 +422,107 @@
         margin-top: 10px;
     }
 
-    /* Launch button */
+    .save-to-library {
+        margin-top: 10px;
+        width: 100%;
+        background: var(--batik-teal) !important;
+        color: white !important;
+    }
+
+    /* ===== TEMPLATES & SAVED TABS ===== */
+    .gallery-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .gallery-header h2 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.45rem;
+        color: var(--batik-indigo);
+    }
+
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 20px;
+    }
+
+    .template-card {
+        background: white;
+        border: 1px solid #e8dfd0;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(26, 39, 68, 0.07);
+        transition: transform 0.22s ease, box-shadow 0.22s ease;
+    }
+
+    .template-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 14px 28px rgba(26, 39, 68, 0.13);
+    }
+
+    .template-card img {
+        width: 100%;
+        aspect-ratio: 1;
+        object-fit: contain;
+        background: #faf7f0;
+        border-bottom: 1px solid #eee;
+        display: block;
+    }
+
+    .template-card .info {
+        padding: 14px;
+    }
+
+    .template-card h4 {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--batik-indigo);
+        margin-bottom: 6px;
+    }
+
+    .template-card p {
+        font-size: 12.5px;
+        color: #7a776c;
+        margin-bottom: 12px;
+    }
+
+    .template-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .template-actions button,
+    .template-actions a {
+        flex: 1;
+        justify-content: center;
+        font-size: 13px;
+        padding: 8px 10px;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #7a776c;
+    }
+
+    .empty-state h3 {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.3rem;
+        color: var(--batik-indigo);
+        margin-bottom: 10px;
+    }
+
     .launch-wrap {
         text-align: center;
-        margin-top: 36px;
+        margin-top: 40px;
     }
 
     .launch-btn {
@@ -427,16 +546,10 @@
     }
 
     @media (max-width: 900px) {
-        .layout, .results {
-            grid-template-columns: 1fr;
-        }
-        .container {
-            padding: 24px 18px 32px;
-        }
-        .brush-control {
-            margin-left: 0;
-            width: 100%;
-        }
+        .layout, .results { grid-template-columns: 1fr; }
+        .container { padding: 24px 18px 32px; }
+        .brush-control { margin-left: 0; width: 100%; }
+        .tabs { flex-direction: column; }
     }
 </style>
 </head>
@@ -452,117 +565,203 @@
     <div class="error">{{ error }}</div>
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" id="generateForm">
-        <div class="layout">
-            <div class="canvas-section">
-                <div class="canvas-wrap">
-                    <canvas id="drawingCanvas" width="900" height="650"></canvas>
+    <!-- TABS -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="create">Create</button>
+        <button class="tab-btn" data-tab="library">Templates Library</button>
+        <button class="tab-btn" data-tab="saved">My Saved</button>
+    </div>
+
+    <!-- ==================== CREATE TAB ==================== -->
+    <div id="create" class="tab-content active">
+        <form method="POST" enctype="multipart/form-data" id="generateForm">
+            <div class="layout">
+                <div class="canvas-section">
+                    <div class="canvas-wrap">
+                        <canvas id="drawingCanvas" width="900" height="650"></canvas>
+                    </div>
+
+                    <div class="toolbar">
+                        <button type="button" id="penBtn" class="active">✏️ Pen</button>
+                        <button type="button" id="eraserBtn" class="secondary">🧹 Eraser</button>
+                        <button type="button" id="undoBtn" class="secondary">↩ Undo</button>
+                        <button type="button" id="clearBtn" class="secondary">🗑 Clear</button>
+
+                        <div class="brush-control">
+                            Brush
+                            <input type="range" id="brushSize" min="2" max="40" value="8">
+                            <span id="brushValue">8</span> px
+                        </div>
+                    </div>
+
+                    <p class="hint">Tip: Use bold, simple shapes. Mouse, stylus and touch are fully supported.</p>
                 </div>
 
-                <div class="toolbar">
-                    <button type="button" id="penBtn" class="active">✏️ Pen</button>
-                    <button type="button" id="eraserBtn" class="secondary">🧹 Eraser</button>
-                    <button type="button" id="undoBtn" class="secondary">↩ Undo</button>
-                    <button type="button" id="clearBtn" class="secondary">🗑 Clear</button>
+                <div class="panel">
+                    <h3>Optional Image Upload</h3>
+                    <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp">
+                    <button type="button" class="secondary" id="loadToCanvasBtn" style="width:100%;">Load onto Canvas</button>
 
-                    <div class="brush-control">
-                        Brush
-                        <input type="range" id="brushSize" min="2" max="40" value="8">
-                        <span id="brushValue">8</span> px
+                    <hr>
+
+                    <h3>Machine Language Settings</h3>
+                    <div class="settings-grid">
+                        <div>
+                            <label>Width (mm)</label>
+                            <input type="number" name="drawing_width" value="150" min="10" max="1000" step="1">
+                        </div>
+                        <div>
+                            <label>Height (mm)</label>
+                            <input type="number" name="drawing_height" value="150" min="10" max="1000" step="1">
+                        </div>
+                        <div>
+                            <label>Drawing Z (mm)</label>
+                            <input type="number" name="z_draw" value="0.2" step="0.1">
+                        </div>
+                        <div>
+                            <label>Travel Z (mm)</label>
+                            <input type="number" name="z_travel" value="8.0" step="0.1">
+                        </div>
+                        <div>
+                            <label>Draw feed (mm/min)</label>
+                            <input type="number" name="feed_draw" value="1200" min="10" step="10">
+                        </div>
+                        <div>
+                            <label>Travel feed (mm/min)</label>
+                            <input type="number" name="feed_travel" value="3000" min="10" step="10">
+                        </div>
+                    </div>
+
+                    <label>Contour simplification</label>
+                    <input type="number" name="simplify" value="1.5" min="0.1" max="20" step="0.1">
+
+                    <input type="hidden" name="canvas_data" id="canvasData">
+
+                    <button type="submit" class="generate">Generate Image + Machine Language</button>
+
+                    <div id="loading">Generating Image and Machine Language…</div>
+
+                    <div class="warning">
+                        Always test generated Machine Language with the wax tool removed or safely raised first.
+                        Verify machine limits, Z direction, origin and feed rates before running.
                     </div>
                 </div>
+            </div>
+        </form>
 
-                <p class="hint">
-                    Tip: Use bold, simple shapes. Mouse, stylus and touch are fully supported.
+        {% if input_image and output_image %}
+        <div class="results" id="resultsSection">
+            <div class="result-card">
+                <h3>Input</h3>
+                <img src="{{ input_image }}" alt="Input drawing">
+            </div>
+
+            {% if raw_output_image %}
+            <div class="result-card">
+                <h3>AI Batik Outline</h3>
+                <img src="{{ raw_output_image }}" alt="AI generated batik outline">
+                <a class="button secondary download" href="{{ raw_output_image }}" download>Download AI PNG</a>
+            </div>
+            {% endif %}
+
+            <div class="result-card">
+                <h3>Machine-ready B&amp;W</h3>
+                <img id="finalOutputImg" src="{{ output_image }}" alt="Clean black and white outline">
+                <a class="button secondary download" href="{{ output_image }}" download>Download B&amp;W PNG</a>
+                {% if gcode_file %}
+                <br>
+                <a class="button download" href="{{ gcode_file }}" download style="background:var(--batik-indigo);color:white;">Download Machine Language</a>
+                {% endif %}
+                {% if gcode_stats %}
+                <p class="small">
+                    {{ gcode_stats.paths }} contour paths,<br>
+                    {{ gcode_stats.points }} Machine Language points,<br>
+                    approx. {{ "%.1f"|format(gcode_stats.width_mm) }} ×
+                    {{ "%.1f"|format(gcode_stats.height_mm) }} mm.
                 </p>
+                {% endif %}
+                <button type="button" class="button save-to-library" id="saveToMyTemplates">
+                    💾 Save to My Templates
+                </button>
             </div>
-
-            <div class="panel">
-                <h3>Optional Image Upload</h3>
-                <input type="file" id="imageInput" name="image" accept="image/png,image/jpeg,image/webp">
-                <button type="button" class="secondary" id="loadToCanvasBtn" style="width:100%;">Load onto Canvas</button>
-
-                <hr>
-
-                <h3>Machine Language Settings</h3>
-                <div class="settings-grid">
-                    <div>
-                        <label>Width (mm)</label>
-                        <input type="number" name="drawing_width" value="150" min="10" max="1000" step="1">
-                    </div>
-                    <div>
-                        <label>Height (mm)</label>
-                        <input type="number" name="drawing_height" value="150" min="10" max="1000" step="1">
-                    </div>
-                    <div>
-                        <label>Drawing Z (mm)</label>
-                        <input type="number" name="z_draw" value="0.2" step="0.1">
-                    </div>
-                    <div>
-                        <label>Travel Z (mm)</label>
-                        <input type="number" name="z_travel" value="8.0" step="0.1">
-                    </div>
-                    <div>
-                        <label>Draw feed (mm/min)</label>
-                        <input type="number" name="feed_draw" value="1200" min="10" step="10">
-                    </div>
-                    <div>
-                        <label>Travel feed (mm/min)</label>
-                        <input type="number" name="feed_travel" value="3000" min="10" step="10">
-                    </div>
-                </div>
-
-                <label>Contour simplification</label>
-                <input type="number" name="simplify" value="1.5" min="0.1" max="20" step="0.1">
-
-                <input type="hidden" name="canvas_data" id="canvasData">
-
-                <button type="submit" class="generate">Generate Image + Machine Language</button>
-
-                <div id="loading">Generating Image and Machine Language…</div>
-
-                <div class="warning">
-                    Always test generated Machine Language with the wax tool removed or safely raised first.
-                    Verify machine limits, Z direction, origin and feed rates before running.
-                </div>
-            </div>
-        </div>
-    </form>
-
-    {% if input_image and output_image %}
-    <div class="results">
-        <div class="result-card">
-            <h3>Input</h3>
-            <img src="{{ input_image }}" alt="Input drawing">
-        </div>
-
-        {% if raw_output_image %}
-        <div class="result-card">
-            <h3>AI Batik Outline</h3>
-            <img src="{{ raw_output_image }}" alt="AI generated batik outline">
-            <a class="button secondary download" href="{{ raw_output_image }}" download>Download AI PNG</a>
         </div>
         {% endif %}
+    </div>
 
-        <div class="result-card">
-            <h3>Machine-ready B&amp;W</h3>
-            <img src="{{ output_image }}" alt="Clean black and white outline">
-            <a class="button secondary download" href="{{ output_image }}" download>Download B&amp;W PNG</a>
-            {% if gcode_file %}
-            <br>
-            <a class="button download" href="{{ gcode_file }}" download style="background:var(--batik-indigo);color:white;">Download Machine Language</a>
-            {% endif %}
-            {% if gcode_stats %}
-            <p class="small">
-                {{ gcode_stats.paths }} contour paths,<br>
-                {{ gcode_stats.points }} Machine Language points,<br>
-                approx. {{ "%.1f"|format(gcode_stats.width_mm) }} ×
-                {{ "%.1f"|format(gcode_stats.height_mm) }} mm.
-            </p>
-            {% endif %}
+    <!-- ==================== TEMPLATES LIBRARY TAB ==================== -->
+    <div id="library" class="tab-content">
+        <div class="gallery-header">
+            <h2>Templates Library</h2>
+            <p style="font-size:13.5px;color:#7a776c;">Shared batik outlines from the project (stored in GitHub)</p>
+        </div>
+
+        <div class="gallery-grid" id="libraryGrid">
+            <!-- 
+                HOW TO ADD TEMPLATES:
+                1. Put PNG files in your repo:  static/templates/flower-motif.png
+                2. Add an entry below (or later make it dynamic from a JSON file)
+            -->
+            <div class="template-card">
+                <img src="/static/templates/placeholder1.png" alt="Classic Floral" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22%3E%3Crect fill=%22%23f5ede0%22 width=%22240%22 height=%22240%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%231a2744%22 font-family=%22serif%22 font-size=%2218%22%3EFloral Motif%3C/text%3E%3C/svg%3E'">
+                <div class="info">
+                    <h4>Classic Floral</h4>
+                    <p>Traditional Malaysian flower motif</p>
+                    <div class="template-actions">
+                        <button class="secondary load-template" data-src="/static/templates/placeholder1.png">Load to Canvas</button>
+                        <a class="button secondary" href="/static/templates/placeholder1.png" download>Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="template-card">
+                <img src="/static/templates/placeholder2.png" alt="Geometric" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22%3E%3Crect fill=%22%23f5ede0%22 width=%22240%22 height=%22240%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%231a2744%22 font-family=%22serif%22 font-size=%2218%22%3EGeometric%3C/text%3E%3C/svg%3E'">
+                <div class="info">
+                    <h4>Geometric Lattice</h4>
+                    <p>Repeating geometric batik pattern</p>
+                    <div class="template-actions">
+                        <button class="secondary load-template" data-src="/static/templates/placeholder2.png">Load to Canvas</button>
+                        <a class="button secondary" href="/static/templates/placeholder2.png" download>Download</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="template-card">
+                <img src="/static/templates/placeholder3.png" alt="Leaf" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22240%22 height=%22240%22%3E%3Crect fill=%22%23f5ede0%22 width=%22240%22 height=%22240%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%231a2744%22 font-family=%22serif%22 font-size=%2218%22%3ELeaf Motif%3C/text%3E%3C/svg%3E'">
+                <div class="info">
+                    <h4>Leaf &amp; Vine</h4>
+                    <p>Organic leaf and vine design</p>
+                    <div class="template-actions">
+                        <button class="secondary load-template" data-src="/static/templates/placeholder3.png">Load to Canvas</button>
+                        <a class="button secondary" href="/static/templates/placeholder3.png" download>Download</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:28px;padding:16px 20px;background:#f8f1e3;border-radius:14px;border:1px solid rgba(201,162,39,0.3);font-size:13.5px;color:#5c5a52;line-height:1.55;">
+            <strong>How to add more shared templates:</strong><br>
+            1. Create folder <code>static/templates/</code> in your GitHub repo<br>
+            2. Upload PNG outlines (black lines on white background works best)<br>
+            3. Add a new <code>.template-card</code> block in this tab (or later make it load from a JSON list)
         </div>
     </div>
-    {% endif %}
+
+    <!-- ==================== MY SAVED TAB ==================== -->
+    <div id="saved" class="tab-content">
+        <div class="gallery-header">
+            <h2>My Saved Templates</h2>
+            <button class="secondary" id="clearAllSaved" style="font-size:13px;">Clear All</button>
+        </div>
+
+        <div class="gallery-grid" id="savedGrid">
+            <!-- Populated by JavaScript from localStorage -->
+        </div>
+
+        <div class="empty-state" id="savedEmpty" style="display:none;">
+            <h3>No saved templates yet</h3>
+            <p>Generate a design on the Create tab, then click <strong>Save to My Templates</strong>.</p>
+        </div>
+    </div>
 
     <div class="launch-wrap">
         <a href="batiggerappdefnotpronterface://" class="launch-btn">
@@ -572,6 +771,19 @@
 </div>
 
 <script>
+/* ==================== TAB SWITCHING ==================== */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+
+        if (btn.dataset.tab === 'saved') renderSavedTemplates();
+    });
+});
+
+/* ==================== CANVAS DRAWING (unchanged) ==================== */
 const canvas = document.getElementById("drawingCanvas");
 const ctx = canvas.getContext("2d");
 ctx.fillStyle = "white";
@@ -675,35 +887,127 @@ document.getElementById("loadToCanvasBtn").onclick = () => {
     }
     const reader = new FileReader();
     reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-            saveState();
-            ctx.fillStyle = "white";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            const scale = Math.min(
-                canvas.width / img.width,
-                canvas.height / img.height
-            );
-            const w = img.width * scale;
-            const h = img.height * scale;
-            ctx.drawImage(
-                img,
-                (canvas.width - w) / 2,
-                (canvas.height - h) / 2,
-                w,
-                h
-            );
-            canvasChanged = true;
-        };
-        img.src = event.target.result;
+        loadImageToCanvas(event.target.result);
     };
     reader.readAsDataURL(file);
 };
+
+function loadImageToCanvas(src) {
+    const img = new Image();
+    img.onload = () => {
+        saveState();
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+        canvasChanged = true;
+    };
+    img.crossOrigin = "anonymous";
+    img.src = src;
+}
+
+/* Load template from Library or Saved */
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("load-template")) {
+        const src = e.target.dataset.src;
+        loadImageToCanvas(src);
+        // switch to Create tab
+        document.querySelector('[data-tab="create"]').click();
+    }
+});
 
 document.getElementById("generateForm").addEventListener("submit", () => {
     document.getElementById("canvasData").value =
         canvasChanged ? canvas.toDataURL("image/png") : "";
     document.getElementById("loading").style.display = "block";
+});
+
+/* ==================== MY SAVED (localStorage) ==================== */
+const STORAGE_KEY = "batik_my_templates";
+
+function getSaved() {
+    try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    } catch {
+        return [];
+    }
+}
+
+function setSaved(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+function renderSavedTemplates() {
+    const grid = document.getElementById("savedGrid");
+    const empty = document.getElementById("savedEmpty");
+    const items = getSaved();
+
+    grid.innerHTML = "";
+
+    if (items.length === 0) {
+        empty.style.display = "block";
+        return;
+    }
+    empty.style.display = "none";
+
+    items.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "template-card";
+        card.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <div class="info">
+                <h4>${item.name}</h4>
+                <p>Saved ${item.date}</p>
+                <div class="template-actions">
+                    <button class="secondary load-template" data-src="${item.image}">Load</button>
+                    <a class="button secondary" href="${item.image}" download="${item.name}.png">Download</a>
+                    <button class="secondary delete-saved" data-index="${index}" style="background:#f0d0d0;color:#8c1717;">Delete</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("delete-saved")) {
+        const idx = Number(e.target.dataset.index);
+        const items = getSaved();
+        items.splice(idx, 1);
+        setSaved(items);
+        renderSavedTemplates();
+    }
+});
+
+document.getElementById("clearAllSaved")?.addEventListener("click", () => {
+    if (confirm("Delete all saved templates from this browser?")) {
+        setSaved([]);
+        renderSavedTemplates();
+    }
+});
+
+/* Save current generation to My Templates */
+document.getElementById("saveToMyTemplates")?.addEventListener("click", () => {
+    const imgEl = document.getElementById("finalOutputImg");
+    if (!imgEl) return;
+
+    const name = prompt("Name this template:", `Batik ${new Date().toLocaleDateString()}`);
+    if (!name) return;
+
+    const items = getSaved();
+    items.unshift({
+        name: name.trim(),
+        image: imgEl.src,          // data URL or server path
+        date: new Date().toLocaleString()
+    });
+
+    // keep only last 30 to avoid localStorage bloat
+    if (items.length > 30) items.length = 30;
+
+    setSaved(items);
+    alert("Saved to My Templates!");
 });
 </script>
 </body>
