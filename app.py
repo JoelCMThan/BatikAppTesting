@@ -36,8 +36,7 @@ Preserve the main subject, recognizable shape, pose, proportions, and important
 features, but simplify the drawing substantially.
 
 STYLE:
-- Add Malaysian Floral patterns
-- Beautify the original drawing, keep the original drawing alive, make it simple and minimalistic
+- Beautify the original drawing with simple, little Malaysian Floral patterns, keep the original drawing alive, make it simple and minimalistic
 - clean black outlines on a pure white background
 - thick, smooth, consistent lines
 - simple coloring-book / batik tracing template
