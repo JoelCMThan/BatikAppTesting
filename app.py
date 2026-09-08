@@ -561,7 +561,7 @@ def index():
                     model="gpt-image-2",
                     image=image_file,
                     prompt=BATIK_PROMPT,
-                    size="512x512"
+                    size="1024x1024"
                 )
 
             image_base64 = result.data[0].b64_json
